@@ -1,0 +1,57 @@
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.ml-auto {
+    margin-left: auto;
+}
+
+.border-1 {
+    border-width: 1px;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.border-round {
+    border-radius: 0.25rem; /* o un valor predeterminado */
+}
+
+.text-xs {
+    font-size: 0.75rem; /* 12px aproximadamente */
+}
+
+.p-1 {
+    padding: 0.25rem;
+}
+
+.surface-100 {
+    background-color: #F5F5F5;
+}
+
+.surface-border {
+    border-color: #dfe7ef;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+}
+
+
+.topbar-end {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar-end-input {
+    width: 8rem;
+}
+
+@media (min-width: 640px) {
+    .topbar-end-input {
+      width: auto;
+    }
+  }

@@ -1,0 +1,111 @@
+<p-card>
+    <p-toast />
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <p-button severity="success" label="New" icon="pi pi-plus" class="mr-2" />
+            <!-- <p-button severity="danger" label="Delete" icon="pi pi-trash" (onClick)="deleteSelectedProducts()"
+                [disabled]="!selectedProducts || !selectedProducts.length" /> -->
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import"
+                class="mr-2 inline-block" />
+            <p-button severity="help" label="Export" icon="pi pi-upload" (onClick)="dt.exportCSV()"/>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="pedidos" [rows]="5" responsiveLayout="true" [paginator]="true"
+        [globalFilterFields]="['codigoInterno','descripcion', 'familia', 'marca']"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedPedido" [rowsPerPageOptions]="[5, 10, 20]"
+        [rowHover]="true" dataKey="id"
+        [exportHeader]="'customExportHeader'"
+        [columns]="cols"
+        currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} entradas"
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <h5 class="m-0">Lista de Pedidos</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                        placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem">
+                    <p-tableHeaderCheckbox />
+                </th>
+                <th pSortableColumn="id" style="min-width:4rem">
+                    Codigo <p-sortIcon field="codigo" />
+                </th>
+                <th pSortableColumn="fecha" style="min-width:15rem">
+                    fecha <p-sortIcon field="descripcion" />
+                </th>
+                <th pSortableColumn="estado">
+                    Estado <p-sortIcon field="estado" />
+                </th>
+                <th pSortableColumn="nombreVendedor" style="min-width:10rem">
+                    Vendedor <p-sortIcon field="nombreVendedor" />
+                </th>
+                <th pSortableColumn="nombreCliente">
+                    Cliente <p-sortIcon field="nombreCliente" />
+                </th>
+                <th pSortableColumn="distrito" style="min-width:10rem">
+                    Distrito <p-sortIcon field="distrito" />
+                </th>
+                <th pSortableColumn="direccion" style="min-width:10rem">
+                    Direccion <p-sortIcon field="direccion" />
+                </th>
+                <th pSortableColumn="observacion" style="min-width:10rem">
+                    Observacion <p-sortIcon field="observacion" />
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-pedido>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="pedido" />
+                </td>
+                <td>
+                    {{ pedido.id }}
+                </td>
+                <td>
+                    {{ pedido.fecha }}
+                </td>
+                <td>
+                    <p-tag [value]="pedido.estado"
+                        [severity]="getSeverity(pedido.estado)" />
+                </td>
+                <td>
+                    {{ pedido.nombreVendedor }}
+                </td>
+                <td>
+                    {{ pedido.nombreCliente }}
+                </td>
+                <td>
+                    {{ pedido.distrito }}
+                </td>
+                <td>
+                    {{ pedido.direccion }}
+                </td>
+                <td>
+                    {{ pedido.observacion }}
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
+                        />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                         />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+                En total hay {{ pedidos ? pedidos.length : 0 }} pedidos.
+            </div>
+        </ng-template>
+    </p-table>
+</p-card>

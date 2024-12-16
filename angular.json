@@ -32,7 +32,18 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              {
+                "input": "src/themes/lara-light-purple.css",
+                "bundleName": "lara-light-purple",
+                "inject": false
+              },
+              {
+                "input": "src/themes/lara-dark-purple.css",
+                "bundleName": "lara-dark-purple",
+                "inject": false
+              },
+              "src/styles.scss",
+              "node_modules/primeng/resources/primeng.min.css"
             ],
             "scripts": []
           },

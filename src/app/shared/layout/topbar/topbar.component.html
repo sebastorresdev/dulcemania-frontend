@@ -1,0 +1,23 @@
+<p-menubar [model]="items">
+        <ng-template pTemplate="start">
+            <img src="/img/logo-dulcemania.png" width="55" height="55"/>
+        </ng-template>
+        <ng-template pTemplate="item" let-item let-root="root">
+            <a pRipple class="flex align-items-center p-menuitem-link" [routerLink]="item.routerLink">
+                <span [class]="item.icon"></span>
+                <span class="ml-2">{{ item.label }}</span>
+                <p-badge *ngIf="item.badge" [ngClass]="{ 'ml-auto': !root, 'ml-2': root }" [value]="item.badge" />
+                <i *ngIf="item.items" [ngClass]="['pi', root ? 'pi-angle-down ml-2' : 'pi-angle-right ml-auto']"></i>
+            </a>
+        </ng-template>
+        <ng-template pTemplate="end">
+            <div class="flex align-items-center gap-2">
+                <p-button 
+                [icon]="_themeService.darkMode() ? 'pi pi-sun':'pi pi-moon'"
+                [rounded]="true" 
+                [text]="true" 
+                (onClick)="_themeService.switchTheme()"/>
+                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" />
+            </div>
+        </ng-template>
+</p-menubar>

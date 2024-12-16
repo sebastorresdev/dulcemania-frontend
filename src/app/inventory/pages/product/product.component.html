@@ -1,0 +1,224 @@
+<p-card>
+    <p-toast />
+    <p-toolbar styleClass="mb-4 gap-2">
+        <ng-template pTemplate="left">
+            <p-button severity="success" label="New" icon="pi pi-plus" class="mr-2" (onClick)="openNew()" />
+            <p-button severity="danger" label="Delete" icon="pi pi-trash" (onClick)="deleteSelectedProducts()"
+                [disabled]="!selectedProducts || !selectedProducts.length" />
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <p-fileUpload mode="basic" accept="image/*" [maxFileSize]="1000000" label="Import" chooseLabel="Import"
+                class="mr-2 inline-block" />
+            <p-button severity="help" label="Export" icon="pi pi-upload" (onClick)="dt.exportCSV()"/>
+        </ng-template>
+    </p-toolbar>
+
+    <p-table #dt [value]="products" [rows]="5" responsiveLayout="true" [paginator]="true"
+        [globalFilterFields]="['codigoInterno','descripcion', 'familia', 'marca']"
+        [tableStyle]="{ 'min-width': '75rem' }" [(selection)]="selectedProducts" [rowsPerPageOptions]="[5, 10, 20]"
+        [rowHover]="true" dataKey="id"
+        [exportHeader]="'customExportHeader'"
+        [columns]="cols"
+        currentPageReportTemplate="Mostrando de {first} a {last} de {totalRecords} entradas"
+        [showCurrentPageReport]="true">
+        <ng-template pTemplate="caption">
+            <div class="flex align-items-center justify-content-between">
+                <h5 class="m-0">Administrar Productos</h5>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                        placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 4rem">
+                    <p-tableHeaderCheckbox />
+                </th>
+                <th pSortableColumn="codigo" style="min-width:4rem">
+                    Codigo <p-sortIcon field="codigo" />
+                </th>
+                <th pSortableColumn="descripcion" style="min-width:15rem">
+                    Descripcion <p-sortIcon field="descripcion" />
+                </th>
+                <th>
+                    Imagen
+                </th>
+                <th pSortableColumn="price">
+                    Precio <p-sortIcon field="price" />
+                </th>
+                <th pSortableColumn="category" style="min-width:10rem">
+                    Familia <p-sortIcon field="category" />
+                </th>
+                <th pSortableColumn="rating">
+                    Marca <p-sortIcon field="rating" />
+                </th>
+                <th pSortableColumn="inventoryStatus" style="min-width:10rem">
+                    Estado <p-sortIcon field="inventoryStatus" />
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product>
+            <tr>
+                <td>
+                    <p-tableCheckbox [value]="product" />
+                </td>
+                <td>
+                    {{ product.codigoInterno }}
+                </td>
+                <td>
+                    {{ product.descripcion }}
+                </td>
+                <td>
+                    <p-image [src]="'http://localhost:8070/uploads/products/' + product.urlImg" alt="Image" height="50"
+                        [preview]="true" />
+                </td>
+                <td>
+                    {{ product.precioUnitario | currency:'S/':'symbol':'1.2-2' }}
+                </td>
+                <td>
+                    {{ product.familia }}
+                </td>
+                <td>
+                    {{ product.marca }}
+                </td>
+                <td>
+                    <p-tag [value]="product.stock > 0 ? 'INSTOCK' : 'OUTOFSTOCK'"
+                        [severity]="getSeverity(product.stock)" />
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
+                        (onClick)="editProduct(product)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (onClick)="deleteProduct(product)" />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div class="flex align-items-center justify-content-between">
+                En total hay {{ products ? products.length : 0 }} productos.
+            </div>
+        </ng-template>
+    </p-table>
+
+    <p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }"
+        [header]="(newProduct? 'Nuevo': 'Editar') + ' Producto'" [modal]="true" styleClass="p-fluid">
+        <ng-template pTemplate="content">
+            <form [formGroup]="form">
+                <div class="field">
+                    <label for="codigo">Codigo</label>
+                    <input type="text" pInputText formControlName="codigoInterno" id="codigo" autofocus />
+                    @if(hasRequiredError('codigoInterno')) {
+                    <small class="p-error">El codigo es requerido.</small>
+                    }
+                </div>
+                <div class="field">
+                    <label for="descripcion">Descripcion</label>
+                    <input type="text" pInputText formControlName="descripcion" id="descripcion" />
+                    @if(hasRequiredError('descripcion')) {
+                    <small class="p-error">La descripcion es requerido.</small>
+                    }
+                </div>
+                <div class="field">
+                    <label for="familia">Familia</label>
+                    <p-dropdown formControlName="familia" inputId="familia" optionLabel="nombre" [filter]="true"
+                        [options]="familias">
+                    </p-dropdown>
+                    @if(hasRequiredError('familia')) {
+                    <small class="p-error">La familia es requerido.</small>
+                    }
+                </div>
+                <div class="field">
+                    <label for="marca">Marca</label>
+                    <p-dropdown formControlName="marca" inputId="marca" optionLabel="nombre" [filter]="true"
+                        [options]="marcas">
+                    </p-dropdown>
+                    @if(hasRequiredError('marca')) {
+                    <small class="p-error">La marca es requerido.</small>
+                    }
+                </div>
+                <div class="field">
+                    <label for="marca">Unidad de medida</label>
+                    <p-dropdown formControlName="unidadMedida" inputId="unidadMedida" optionLabel="abreviatura" [filter]="true"
+                        [options]="unidades">
+                    </p-dropdown>
+                    @if(hasRequiredError('unidadMedida')) {
+                    <small class="p-error">La unidad de medida es requerido.</small>
+                    }
+                </div>
+                <div class="formgrid grid">
+                    <div class="field col">
+                        <label for="price">Precio</label>
+                        <p-inputNumber id="price" formControlName="precioUnitario" mode="currency" currency="USD"
+                            locale="en-PE" />
+                        @if(hasRequiredError('precioUnitario')) {
+                        <small class="p-error">El precio es requerido.</small>
+                        }
+                    </div>
+                    <div class="field col">
+                        <label for="quantity">Stock Minimo</label>
+                        <p-inputNumber id="quantity" formControlName="stockMinimo" />
+                        @if(hasRequiredError('stockMinimo')) {
+                        <small class="p-error">El stock minimo es requerido.</small>
+                        }
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="codigoBarras">Codigo barras</label>
+                    <input type="text" pInputText formControlName="codigoBarras" id="codigoBarras" />
+                </div>
+                <div style="width: 100%;">
+                    @if(imgEdit) {
+                        <p-toast />
+                        <p-fileUpload #fileUploadRef name="file" [customUpload]="true" [auto]="false" [multiple]="false"
+                            accept="image/*" maxFileSize="1000000" (onSelect)="onSelectedFiles($event)">
+                            <ng-template pTemplate="header">
+                                <div class="flex align-items-center gap-2">
+                                    <p-button label="Cargar" icon="pi pi-upload" (onClick)="fileUploadRef.choose()"
+                                        [outlined]="true" />
+                                    <p-button (onClick)="clearSelected()" label="Eliminar" [outlined]="true"
+                                        icon="pi pi-trash" severity="danger" [disabled]="!files || files.length === 0" />
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="content" let-files let-uploadedFiles="uploadedFiles"
+                                let-removeFileCallback="removeFileCallback"
+                                let-removeUploadedFileCallback="removeUploadedFileCallback">
+                                <div *ngIf="files?.length > 0" class="image-container">
+                                    <img role="presentation" [alt]="files[0].name" [src]="files[0].objectURL" />
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="file"> </ng-template>
+                            <ng-template pTemplate="empty">
+                                <div class="flex align-items-center justify-content-center flex-column">
+                                    <i
+                                        class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400"></i>
+                                    <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+                                </div>
+                            </ng-template>
+                        </p-fileUpload>
+                    }
+                    @else{
+                        <div class="flex align-items-center gap-2">
+                            <p-button (onClick)="deleteImg()" label="Eliminar" [outlined]="true"
+                                icon="pi pi-trash" severity="danger"/>
+                        </div>
+                        <div class="image-container">
+                            <img [alt]="'img'" [src]="'http://localhost:8070/uploads/products/' + product.urlImg" />
+                        </div>
+                    }
+                </div>
+            </form>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+            <p-button label="Cancelar" icon="pi pi-times" severity="danger" [text]="true" (onClick)="hideDialog()" />
+            <p-button label="Guardar" type="submit" icon="pi pi-check" [text]="true" [disabled]="form.invalid"
+                (onClick)="saveProduct()" />
+        </ng-template>
+    </p-dialog>
+
+    <p-confirmDialog [style]="{ width: '450px' }" />
+</p-card>
